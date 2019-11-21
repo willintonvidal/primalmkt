@@ -36,7 +36,8 @@
           
           api.authenticate(this.username,this.password).then(res =>{
             console.log(res.data);
-            window.localStorage.token = res.data.access_token
+            console.log(res.data.data.access_token);
+            window.localStorage.token = res.data.data.access_token
             this.$router.push('/dash')
           }).catch(err => {console.log(err),alert("Datos incorrectos")});
         }

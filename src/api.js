@@ -21,5 +21,11 @@ api.authenticate = function(username,password){
     .catch(err => console.log('[ERROR]', err))
 }
 
+api.listarProducto = function(){
+    return trae.get('/api/v1/dashboard/producto/listar')
+    .then(res => res)
+    .catch(err => console.log('[ERROR]',err))
+}
+
 
 export default api

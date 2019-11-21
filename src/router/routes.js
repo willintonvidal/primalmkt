@@ -6,8 +6,8 @@ import NotFound from "@/pages/NotFoundPage.vue";
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */"@/pages/Dashboard.vue");
 const Profile = () => import(/* webpackChunkName: "common" */ "@/pages/Profile.vue");
 const Notifications = () => import(/* webpackChunkName: "common" */"@/pages/Notifications.vue");
-const Icons = () => import(/* webpackChunkName: "common" */ "@/pages/Icons.vue");
-const Producto = () => import(/* webpackChunkName: "common" */ "@/pages/Producto.vue");
+const ListarProductos = () => import(/* webpackChunkName: "common" */ "@/pages/ListarProductos.vue");
+const CrearProducto = () => import(/* webpackChunkName: "common" */ "@/pages/CrearProducto.vue");
 const Typography = () => import(/* webpackChunkName: "common" */ "@/pages/Typography.vue");
 const TableList = () => import(/* webpackChunkName: "common" */ "@/pages/TableList.vue");
 
@@ -21,7 +21,8 @@ const routes = [
     meta:{isPublic:true}
   },{
     path:"/",
-    component:Login
+    component:Login,
+    name:"inicio"
   },
   {
     path: "/dash",
@@ -44,14 +45,14 @@ const routes = [
         component: Notifications
       },
       {
-        path: "/icons",
-        name: "icons",
-        component: Icons
+        path: "/producto/listar",
+        name: "ListarProductos",
+        component: ListarProductos
       },
       {
-        path: "/producto",
-        name: "producto",
-        component: Producto
+        path: "/producto/crear",
+        name: "CrearProducto",
+        component: CrearProducto
       },
       {
         path: "/typography",

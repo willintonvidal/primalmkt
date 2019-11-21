@@ -91,7 +91,7 @@
                 <a href="#" class="nav-item dropdown-item">Settings</a>
               </li>
               <div class="dropdown-divider"></div>
-              <li class="nav-link">
+              <li class="nav-link" @click="logout">
                 <a href="#" class="nav-item dropdown-item">Log out</a>
               </li>
             </base-dropdown>
@@ -145,6 +145,10 @@
       },
       toggleMenu() {
         this.showMenu = !this.showMenu;
+      },
+      logout(){
+        localStorage.clear();
+        this.$router.push('/')
       }
     }
   };
