@@ -12,6 +12,7 @@
 import api from "@/api";
 import Producto from '../components/Producto/Producto.vue'
 
+
 export default {
   name:'ListarProductos',
   components:{Producto},
@@ -23,15 +24,21 @@ export default {
     methods: {
         listaProductos(){
             api.listarProducto().then(res =>{
-                console.log(res.data.data);
+                //console.log(res.data.data);
                 this.productos = res.data.data;
             }).catch(err =>{
 
-            })
+            }),
+            api.axiosListarProductos().then(res =>{
+              console.log("Axios: "+res)
+              var obj = JSON.parse(res);
+              
+              }).catch(err =>{})
         }       
     },
     created(){
         this.listaProductos();
+    },mounted(){
     }
 };
 </script>
