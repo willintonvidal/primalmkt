@@ -2,15 +2,19 @@
 
 
 
-<form-wizard @on-complete="onComplete">
+<form-wizard @on-complete="onComplete" error-color="#ff4949">
      <tab-content title="Datos del producto" icon="tim-icons icon-single-02">
        <div class="form-row">
-        <base-input class="col-md-12" type="text" label="Nombre del producto" placeholder="Nombre del producto" v-model="nombre"/>
-        
+         <ValidationProvider name="nombre" rules="required" class="col-md-12">
+              <div slot-scope="{ errors }">
+                  <base-input  type="text" label="Nombre del producto" placeholder="Nombre del producto" v-model="nombre"/>
+                  <p>{{ errors[0] }}</p>
+              </div>
+        </ValidationProvider>
       </div>
       <div class="form-row">
         <base-input class="col-md-4" label="Titulo de la descripción" placeholder="Titulo de la descripción" v-model="descripcion_titulo"/>
-        <base-input class="col-md-4" label="Contenido" placeholder="Contenido" v-model="descripcion_contenido"/>
+        <base-input class="col-md-4" label="Descripción contenido" placeholder="Descripción contenido" v-model="descripcion_contenido"/>
         <base-input class="col-md-4" label="Ubicación" placeholder="Ubicación" v-model="descripcion_ubicacion"/>
       </div>
       <div class="form-row">
@@ -37,32 +41,41 @@
       
      </tab-content>
      <tab-content title="Sección imagenes" icon="tim-icons icon-world">
-      <div class="form-row">
-        <div class="col-md-12">
-           <label>Seleccionar imagen principal</label>
-           <input class="form-control" type="file" @change="obtenerImagenPrincipal"/>
-           <img width="200" height="200" alt="Foto del producto" :src="imagen"/>
-        </div>
-        <div class="col-md-12">
-           <label>Seleccionar imagen </label>
-           <input class="form-control" type="file" @change="obtenerImagenes"/>
-        </div>
-      </div>
+      
+           <h3>Las primera imagen que selecciones sera la imagen principal del producto</h3>
+           <input class="form-control" type="file" @change="obtenerImagenPrincipal" multiple="multiple"/>
+           <div class="form-row">
+              <div v-for="(img,i) in this.arrayImage" class="col-md-3">       
+                      
+                      <img style="max-width:100%" alt="Foto del producto" :src="img" class="img-thumbnail col-md-2"/>
+              </div>
+          </div>
+      
      </tab-content>
+
  </form-wizard>
 
 
 </template>
 <script>
 import api from "@/api";
+import toastr from "toastr";
 import {FormWizard, TabContent} from 'vue-form-wizard'
 import 'vue-form-wizard/dist/vue-form-wizard.min.css'
 
+import { ValidationProvider, extend } from 'vee-validate';
+import { required } from 'vee-validate/dist/rules';
+
+extend('required', {
+  ...required,
+  message: 'Este campo es requerido..'
+});
 
 export default {
     components: {
   FormWizard,
-  TabContent
+  TabContent,
+  ValidationProvider
 },
 props:{
   subtitle: {
@@ -72,29 +85,31 @@ props:{
 },
     data(){
         return{
+
+                nombre:"",
+                descripcion_titulo:"",
+                descripcion_contenido:"",
+                descripcion_ubicacion:"",
+                contenido:"",
+                ingredientes:"",
+                stock:0,
+                precio_publico:0,
+                precio_base:0,
+                marca_id:0,
+                proveedor_id:0,
+                categoria_id:0,
+                tags:"",
+                sub_categorias:0,
             imagenMiniatura:'',
-            nombre:"",
-            descripcion_titulo:"",
-            descripcion_contenido:"",
-            descripcion_ubicacion:"",
-            contenido:"",
-            ingredientes:"",
-            stock:0,
-            precio_publico:0,
-            precio_base:0,
-            marca_id:0,
-            proveedor_id:0,
-            categoria_id:0,
-            tags:"",
-            sub_categorias:0,
             imagenes:null,
-            imagen_principal:null,            
+            imagen_principal:null,
+            arrayImage:[]       
         }
         
     },
     methods: {
           onComplete: function(){
-          alert('Yay. Done!');
+          
           let formData = new FormData();
           formData.append('nombre',this.nombre);
           formData.append('descripcion[0][titulo]',this.descripcion_titulo);
@@ -110,36 +125,45 @@ props:{
           formData.append('categoria_id',this.categoria_id);
           formData.append('tags[0]',this.tags);
           formData.append('sub_categorias[1]',this.sub_categorias);
-          formData.append('imagenes[1]',this.imagen_principal);
+          
           formData.append('imagen_principal',this.imagen_principal);
 
+          for(var i =1;i<this.imagenes.length;i++){
+              formData.append(`imagenes[${i-1}]` ,this.imagenes[i]);   
+          }
+
           api.axiosCrearProducto(formData).then(res =>{
+                toastr.success("Se creo correctamente el producto!");
                 console.log(res);
-                
             }).catch(err =>{
             })
        },
        obtenerImagenPrincipal(e){
-         let file = e.target.files[0]
-         this.imagen_principal = file;
-         
+         let file = e.target.files
+         this.imagenes = file;
+         this.imagen_principal = file[0]; 
          this.cargarImagenPrincipal(file);
        },
-       obtenerImagenes(e){
-         let file = e.target.files
-         console.log(file);
-         this.imagenes = file;
-       },
        cargarImagenPrincipal(file){
-         let reader = new FileReader();
-         reader.onload = (e) =>{
-            this.imagenMiniatura = e.target.result
+
+         for(var i=0;i<file.length;i++){
+              let reader = new FileReader();
+              reader.onload = (e) =>{
+                  this.imagenMiniatura = e.target.result
+                  this.arrayImage.push(e.target.result);
+                  
+              }
+              reader.readAsDataURL(file[i]);
          }
-         reader.readAsDataURL(file);
+       },
+       prueba(){
+         console.log(this.arrayImage);
        }
+  
     },
     computed:{
       imagen(){
+        
         return this.imagenMiniatura;
       }
     },
